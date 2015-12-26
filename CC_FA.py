@@ -19,6 +19,7 @@ def main():
     dtiLoc = '/Volumes/CCNC_3T_2/kcho/temple/preprocessed/preprocessedData/'
     subjectDirs = [x for x in os.listdir(freesurferLoc) if x.endswith('pre') or \
                                                            x.endswith('post')]
+    outputFaLoc = os.path.join(freesurferLoc, 'result.csv')
 
     roiDict = {'CC_Posterior':251,
                 'CC_Mid_Posterior':252,
@@ -26,69 +27,87 @@ def main():
                 'CC_Mid_Anterior':254,
                 'CC_Anterior':255}
 
+    subjectDict = {}
     for subject in subjectDirs:
-        print subject
+        try:  #missing data skip
+            print subject
 
-        subjectLoc = os.path.join(freesurferLoc, subject)
-        nodifBrain = os.path.join(dtiLoc,subject,'hifi_nodif_brain.nii.gz')
-        fsBrainLoc = os.path.join(subjectLoc, 'mri', 'brain.mgz')
-        fsBrainLocNii = fsBrainLoc[:-4]+'.nii.gz'
-        asegLoc = os.path.join(subjectLoc,
-                               'mri','aseg.mgz')
-        fs2dtiMat = os.path.join(subjectLoc, 'fs2dti.mat')
-        
-        
-        
+            subjectLoc = os.path.join(freesurferLoc, subject)
+            nodifBrain = os.path.join(dtiLoc,subject,'hifi_nodif_brain.nii.gz')
+            fsBrainLoc = os.path.join(subjectLoc, 'mri', 'brain.mgz')
+            fsBrainLocNii = fsBrainLoc[:-4]+'.nii.gz'
+            asegLoc = os.path.join(subjectLoc,
+                                   'mri','aseg.mgz')
+            fs2dtiMat = os.path.join(subjectLoc, 'fs2dti.mat')
+            
+            
+            convert = fs.MRIConvert(in_file=fsBrainLoc,
+                                    out_type='niigz',
+                                    out_file=fsBrainLocNii)
+            if not os.path.isfile(fsBrainLocNii):
+                convert.run()
 
-        convert = fs.MRIConvert(in_file=fsBrainLoc,
-                                out_type='niigz',
-                                out_file=fsBrainLocNii)
-        if not os.path.isfile(fsBrainLocNii):
-            convert.run()
-
-        flirt = fsl.FLIRT(in_file = fsBrainLocNii,
-                reference = nodifBrain,
-                interp = 'nearestneighbour',
-                out_matrix_file = fs2dtiMat)
-
-        if not os.path.isfile(fs2dtiMat):
-            flirt.run()
-
-
-        for roi, roiNum in roiDict.iteritems():
-            roiLoc = os.path.join(subjectLoc,roi+'.nii.gz')
-            roiLocReg = os.path.join(subjectLoc,roi+'_reg.nii.gz')
-            fa_mean = os.path.join(subjectLoc, roi+'_FA.txt')
-
-            binarize = fs.Binarize(in_file = asegLoc,
-                    match = [roiNum],
-                    binary_file = roiLoc)
-            if not os.path.isfile(roiLoc):
-                binarize.run()
-
-            applyReg = fsl.ApplyXfm(in_file = roiLoc,
+            flirt = fsl.FLIRT(in_file = fsBrainLocNii,
                     reference = nodifBrain,
-                    in_matrix_file = fs2dtiMat,
                     interp = 'nearestneighbour',
-                    out_file = roiLocReg)
+                    out_matrix_file = fs2dtiMat)
 
-            if not os.path.isfile(roiLocReg):
-                applyReg.run()
-            else:
-                applyReg.run()
+            if not os.path.isfile(fs2dtiMat):
+                flirt.run()
 
 
+            faDict = {}
+            for roi, roiNum in roiDict.iteritems():
+                roiLoc = os.path.join(subjectLoc,roi+'.nii.gz')
+                roiLocReg = os.path.join(subjectLoc,roi+'_reg.nii.gz')
+                fa_mean = os.path.join(subjectLoc, roi+'_FA.txt')
 
-            faFile = os.path.join(dtiLoc,subject, 'dti_FA.nii.gz')
-            faStamp = fsl.ImageStats(op_string = '-k {mask} -M'.format(mask = roiLocReg),
-                    #mask_file = roiLocReg,
-                    in_file = faFile,)
-            print faStamp.cmdline
-        
+                binarize = fs.Binarize(in_file = asegLoc,
+                        match = [roiNum],
+                        binary_file = roiLoc)
+                if not os.path.isfile(roiLoc):
+                    binarize.run()
 
-            stats = faStamp.run()
-            print stats.outputs
+                applyReg = fsl.ApplyXfm(in_file = roiLoc,
+                        reference = nodifBrain,
+                        in_matrix_file = fs2dtiMat,
+                        interp = 'nearestneighbour',
+                        out_file = roiLocReg)
 
+                if not os.path.isfile(roiLocReg):
+                    applyReg.run()
+                #else:
+                    #applyReg.run()
+
+
+
+                faFile = os.path.join(dtiLoc,subject, 'dti_FA.nii.gz')
+                faStamp = fsl.ImageStats(op_string = '-k {mask} -M'.format(mask = roiLocReg),
+                        #mask_file = roiLocReg,
+                        in_file = faFile,)
+                print faStamp.cmdline
+            
+
+                stats = faStamp.run()
+                meanFA = stats.outputs.out_stat
+                faDict[roi] = meanFA
+            subjectDict[subject] = faDict
+        except:
+            pass
+
+
+    df = pd.DataFrame(subjectDict)
+    if not os.path.isfile(outputFaLoc):
+        df.to_csv(outputFaLoc)
+
+
+    # output wrangling 
+    #df = pd.read_csv(outputFaLoc, index_col = 0)
+    df = df.T
+    df['group'] = df.index.str[:3]
+    df['timeline'] = df.index.str.split('_').str[1]
+
+    print df.groupby(('group','timeline')).describe()
 
 
 
