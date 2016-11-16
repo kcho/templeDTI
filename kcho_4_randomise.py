@@ -1,9 +1,10 @@
+#!/ccnc_bin/venv/bin/python
 import os
 import re
 
 skeletonDirectories = [
-    'fa_collection/skeleton_images/splitSkeleton/post_m_pre',
-    'fa_collection/skeleton_images/splitSkeleton/pre_m_post']
+    'skeleton_images/splitSkeleton/post_m_pre',
+    'skeleton_images/splitSkeleton/pre_m_post']
 
 def main():
     for skeletonDirectory in skeletonDirectories:
