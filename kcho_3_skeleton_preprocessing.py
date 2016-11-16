@@ -32,7 +32,6 @@ def main():
     skeletonList = [x for x in os.listdir(splitDir) if x.startswith('skeleton')]
     print '-'*10,'pre-post all_FA_skeletonised','-'*10
 
-
     for skeleton in skeletonList:
         num = re.search('\d{4}',skeleton).group()
         if int(num)%2 == 0:
@@ -64,8 +63,8 @@ def main():
                             str(postNum) + '_' + str(preNum))
         print command2
 
-        #os.popen(command1).read()
-        #os.popen(command2).read()
+        os.popen(command1).read()
+        os.popen(command2).read()
 
 
     post_m_pre_imgs= [x for x in os.listdir(post_m_preDir)]
