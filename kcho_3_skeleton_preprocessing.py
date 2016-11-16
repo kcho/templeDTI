@@ -1,3 +1,5 @@
+!/ccnc_bin/venv/bin/python
+
 import os
 import re
 import shutil
@@ -13,7 +15,7 @@ def main():
     makeDirectory(skeltDir)
     if 'all_FA_skeletonised.nii.gz' not in os.listdir(skeltDir):
         print '-'*10,'copying all_FA_skeletonised','-'*10
-        shutil.copy('fa_collection/stats/all_FA_skeletonised.nii.gz',skeltDir)
+        shutil.copy('stats/all_FA_skeletonised.nii.gz',skeltDir)
     makeDirectory(splitDir)
     makeDirectory(postDir)
     makeDirectory(preDir)
