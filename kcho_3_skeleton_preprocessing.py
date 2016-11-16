@@ -1,10 +1,10 @@
-!/ccnc_bin/venv/bin/python
+#!/ccnc_bin/venv/bin/python
 
 import os
 import re
 import shutil
 
-skeltDir = 'fa_collection/skeleton_images'
+skeltDir = 'skeleton_images'
 splitDir = skeltDir+'/splitSkeleton'
 preDir = splitDir+'/pre'
 postDir = splitDir+'/post'
@@ -12,6 +12,7 @@ post_m_preDir = splitDir+'/post_m_pre'
 pre_m_postDir = splitDir+'/pre_m_post'
 
 def main():
+    print os.getcwd()
     makeDirectory(skeltDir)
     if 'all_FA_skeletonised.nii.gz' not in os.listdir(skeltDir):
         print '-'*10,'copying all_FA_skeletonised','-'*10
@@ -22,25 +23,25 @@ def main():
     makeDirectory(post_m_preDir)
     makeDirectory(pre_m_postDir)
 
-    #if 'skeleton0091' not in os.listdir(splitDir) and \
-            #'pre_0091.nii.gz' not in os.listdir(postDir):
-        #print '-'*10,'spliting all_FA_skeletonised','-'*10
-        #os.system('fslsplit {0}/all_FA_skeletonised.nii.gz {1}/skeleton -t'.format(
-            #skeltDir,splitDir))
+    if 'skeleton0091' not in os.listdir(splitDir) and \
+            'pre_0091.nii.gz' not in os.listdir(postDir):
+        print '-'*10,'spliting all_FA_skeletonised','-'*10
+        os.system('fslsplit {0}/all_FA_skeletonised.nii.gz {1}/skeleton -t'.format(
+            skeltDir,splitDir))
 
-    #skeletonList = [x for x in os.listdir(splitDir) if x.startswith('skeleton')]
-    #print '-'*10,'pre-post all_FA_skeletonised','-'*10
+    skeletonList = [x for x in os.listdir(splitDir) if x.startswith('skeleton')]
+    print '-'*10,'pre-post all_FA_skeletonised','-'*10
 
 
-    #for skeleton in skeletonList:
-        #num = re.search('\d{4}',skeleton).group()
-        #if int(num)%2 == 0:
-            ##post comes first alphabetically
-            #shutil.move(os.path.join(splitDir,skeleton),
-                        #postDir+'/post_'+num+'.nii.gz')
-        #else:
-            #shutil.move(os.path.join(splitDir,skeleton),
-                        #preDir+'/pre_'+num+'.nii.gz')
+    for skeleton in skeletonList:
+        num = re.search('\d{4}',skeleton).group()
+        if int(num)%2 == 0:
+            #post comes first alphabetically
+            shutil.move(os.path.join(splitDir,skeleton),
+                        postDir+'/post_'+num+'.nii.gz')
+        else:
+            shutil.move(os.path.join(splitDir,skeleton),
+                        preDir+'/pre_'+num+'.nii.gz')
 
     for preImg, postImg in zip(os.listdir(preDir),os.listdir(postDir)):
         print preImg, postImg
