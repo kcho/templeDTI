@@ -3,8 +3,8 @@ import os
 import re
 
 skeletonDirectories = [
-    'skeleton_images/splitSkeleton/post_m_pre',
-    'skeleton_images/splitSkeleton/pre_m_post']
+    'skeleton_images/splitSkeleton/post_m_pre']
+    #'skeleton_images/splitSkeleton/pre_m_post']
 
 def main():
     for skeletonDirectory in skeletonDirectories:
@@ -28,16 +28,16 @@ def main():
             f.write(design_mat)
 
 
-    command='randomise \
-            -i {skeletonDirectory}/pre_minus_post_merged.nii.gz \
-            -o {skeletonDirectory}/tbss_pre_m_post \
-            -m fa_collection/stats/mean_FA_skeleton_mask \
-            -d {skeletonDirectory}/design.mat \
-            -t {skeletonDirectory}/design.con \
-            -n 5000 \
-            --T2'.format(skeletonDirectory=skeletonDirectories[1])
+    #command='randomise \
+            #-i {skeletonDirectory}/pre_minus_post_merged.nii.gz \
+            #-o {skeletonDirectory}/tbss_pre_m_post \
+            #-m fa_collection/stats/mean_FA_skeleton_mask \
+            #-d {skeletonDirectory}/design.mat \
+            #-t {skeletonDirectory}/design.con \
+            #-n 5000 \
+            #--T2'.format(skeletonDirectory=skeletonDirectories[1])
 
-    os.system(command)
+    #os.system(command)
 
     command='randomise \
             -i {skeletonDirectory}/post_minus_pre_merged.nii.gz \
