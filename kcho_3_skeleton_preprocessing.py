@@ -21,7 +21,7 @@ def main():
     makeDirectory(postDir)
     makeDirectory(preDir)
     makeDirectory(post_m_preDir)
-    makeDirectory(pre_m_postDir)
+    #makeDirectory(pre_m_postDir)
 
     if 'skeleton0091' not in os.listdir(splitDir) and \
             'pre_0091.nii.gz' not in os.listdir(postDir):
@@ -47,13 +47,13 @@ def main():
         preNum = int(re.search('\d{4}',preImg).group())
         postNum = int(re.search('\d{4}',postImg).group())
 
-        command1 = 'fslmaths {pre} -sub {post} {pre_m_post}'.format(
-                    pre=preDir+'/'+preImg,
-                    post=postDir+'/'+postImg,
-                    pre_m_post= pre_m_postDir + \
-                            '/pre_minus_post_' + \
-                            str(postNum) + '_' + str(preNum))
-        print command1
+        #command1 = 'fslmaths {pre} -sub {post} {pre_m_post}'.format(
+                    #pre=preDir+'/'+preImg,
+                    #post=postDir+'/'+postImg,
+                    #pre_m_post= pre_m_postDir + \
+                            #'/pre_minus_post_' + \
+                            #str(postNum) + '_' + str(preNum))
+        #print command1
 
         command2 = 'fslmaths {post} -sub {pre} {post_m_pre}'.format(
                     pre=preDir+'/'+preImg,
@@ -63,27 +63,27 @@ def main():
                             str(postNum) + '_' + str(preNum))
         print command2
 
-        os.popen(command1).read()
+        #os.popen(command1).read()
         os.popen(command2).read()
 
 
     post_m_pre_imgs= [x for x in os.listdir(post_m_preDir)]
-    pre_m_post_imgs = [x for x in os.listdir(pre_m_postDir)]
+    #pre_m_post_imgs = [x for x in os.listdir(pre_m_postDir)]
 
     command3 =  'fslmerge -t {location}/{output} {inputs}'.format(
             location = post_m_preDir,
             output = 'post_minus_pre_merged',
             inputs = ' '.join([post_m_preDir+'/'+x for x in post_m_pre_imgs]))
 
-    command4 =  'fslmerge -t {location}/{output} {inputs}'.format(
-            location = pre_m_postDir,
-            output = 'pre_minus_post_merged',
-            inputs = ' '.join([pre_m_postDir+'/'+x for x in pre_m_post_imgs]))
+    #command4 =  'fslmerge -t {location}/{output} {inputs}'.format(
+            #location = pre_m_postDir,
+            #output = 'pre_minus_post_merged',
+            #inputs = ' '.join([pre_m_postDir+'/'+x for x in pre_m_post_imgs]))
 
     print command3
     os.popen(command3).read()
-    print command4
-    os.popen(command4).read()
+    #print command4
+    #os.popen(command4).read()
 
 def makeDirectory(directory):
     try:
