@@ -3,6 +3,8 @@
 import os
 import re
 import shutil
+import argparse
+import textwrap
 
 skeltDir = 'skeleton_images'
 splitDir = skeltDir+'/splitSkeleton'
@@ -11,7 +13,8 @@ postDir = splitDir+'/post'
 post_m_preDir = splitDir+'/post_m_pre'
 pre_m_postDir = splitDir+'/pre_m_post'
 
-def main():
+def main(args):
+    os.chdir(args.dir)
     print os.getcwd()
     makeDirectory(skeltDir)
     if 'all_FA_skeletonised.nii.gz' not in os.listdir(skeltDir):
@@ -92,9 +95,24 @@ def makeDirectory(directory):
         pass
 
 if __name__=='__main__':
-    main()
+    parser = argparse.ArgumentParser(
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        description=textwrap.dedent('''\
+            {codeName} : Preprocess skeleton images for longitudinal design TBSS
+            ========================================
+            eg) {codeName} -s /Users/kevin/TBSS
+                where there are 'stats' and 'FA' directories.
+            '''.format(codeName=os.path.basename(__file__))))
+    parser.add_argument(
+        '-d', '--dir',
+        help='Data directory location, default=pwd',
+        default=os.getcwd())
+    args = parser.parse_args()
 
-
+    if not args.dir:
+        parser.print_help()
+    else:
+        main(args)
 
 
 
