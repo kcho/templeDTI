@@ -6,20 +6,21 @@ import shutil
 import argparse
 import textwrap
 
-skeltDir = 'skeleton_images'
-splitDir = skeltDir+'/splitSkeleton'
-preDir = splitDir+'/pre'
-postDir = splitDir+'/post'
-post_m_preDir = splitDir+'/post_m_pre'
-pre_m_postDir = splitDir+'/pre_m_post'
 
 def main(args):
+    skeltDir = 'skeleton_images_'+args.measure
+    splitDir = skeltDir+'/splitSkeleton'
+    preDir = splitDir+'/pre'
+    postDir = splitDir+'/post'
+    post_m_preDir = splitDir+'/post_m_pre'
+    pre_m_postDir = splitDir+'/pre_m_post'
+
     os.chdir(args.dir)
     print os.getcwd()
     makeDirectory(skeltDir)
-    if 'all_FA_skeletonised.nii.gz' not in os.listdir(skeltDir):
-        print '-'*10,'copying all_FA_skeletonised','-'*10
-        shutil.copy('stats/all_FA_skeletonised.nii.gz',skeltDir)
+    if 'all_{measure}_skeletonised.nii.gz'.format(measure=args.measure) not in os.listdir(skeltDir):
+        print '-'*10,'copying all_{0}_skeletonised'.format(args.measure),'-'*10
+        shutil.copy('stats/all_{0}_skeletonised.nii.gz'.format(args.measure),skeltDir)
     makeDirectory(splitDir)
     makeDirectory(postDir)
     makeDirectory(preDir)
@@ -28,12 +29,12 @@ def main(args):
 
     if 'skeleton0091' not in os.listdir(splitDir) and \
             'pre_0091.nii.gz' not in os.listdir(postDir):
-        print '-'*10,'spliting all_FA_skeletonised','-'*10
-        os.system('fslsplit {0}/all_FA_skeletonised.nii.gz {1}/skeleton -t'.format(
-            skeltDir,splitDir))
+        print '-'*10,'spliting all_{0}_skeletonised'.format(args.measure),'-'*10
+        os.system('fslsplit {0}/all_{3}_skeletonised.nii.gz {1}/skeleton -t'.format(
+            skeltDir,splitDir, args.measure))
 
     skeletonList = [x for x in os.listdir(splitDir) if x.startswith('skeleton')]
-    print '-'*10,'pre-post all_FA_skeletonised','-'*10
+    print '-'*10,'pre-post all_{0}_skeletonised'.format(measure),'-'*10
 
     for skeleton in skeletonList:
         num = re.search('\d{4}',skeleton).group()
@@ -107,6 +108,10 @@ if __name__=='__main__':
         '-d', '--dir',
         help='Data directory location, default=pwd',
         default=os.getcwd())
+    parser.add_argument(
+        '-m', '--measure',
+        help='"FA", "AD", "MD" or "RD"',
+        default="FA")
     args = parser.parse_args()
 
     if not args.dir:
