@@ -1,4 +1,4 @@
-#!/ccnc_bin/venv/bin/python
+#!/home/kangik/anaconda2/bin/python
 
 import os
 import re
@@ -30,7 +30,7 @@ def main(args):
     if 'skeleton0091' not in os.listdir(splitDir) and \
             'pre_0091.nii.gz' not in os.listdir(postDir):
         print '-'*10,'spliting all_{0}_skeletonised'.format(args.measure),'-'*10
-        os.system('fslsplit {0}/all_{3}_skeletonised.nii.gz {1}/skeleton -t'.format(
+        os.system('fslsplit {0}/all_{2}_skeletonised.nii.gz {1}/skeleton -t'.format(
             skeltDir,splitDir, args.measure))
 
     skeletonList = [x for x in os.listdir(splitDir) if x.startswith('skeleton')]
