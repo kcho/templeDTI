@@ -34,7 +34,7 @@ def main(args):
             skeltDir,splitDir, args.measure))
 
     skeletonList = [x for x in os.listdir(splitDir) if x.startswith('skeleton')]
-    print '-'*10,'pre-post all_{0}_skeletonised'.format(measure),'-'*10
+    print '-'*10,'pre-post all_{0}_skeletonised'.format(args.measure),'-'*10
 
     for skeleton in skeletonList:
         num = re.search('\d{4}',skeleton).group()
