@@ -150,7 +150,7 @@ if __name__=='__main__':
     parser.add_argument(
         '-t', '--template',
         help='Template image, "MNI" or "others"',
-        default='MNI')
+        default='other')
     args = parser.parse_args()
 
     if not args.dir:
